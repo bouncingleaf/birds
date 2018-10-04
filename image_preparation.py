@@ -21,6 +21,9 @@ from PIL import Image
 
 # Processing parameters
 SIZE = 224      # for ImageNet models compatibility
+BASE = '/Users/leaf/CS767/'
+# BASE = BASE + ''
+
 DATA_PATH="C:/datasets/CUB_200_2011/CUB_200_2011/"
 OUTPUT_PATH = 'C:/datasets/CUB_200_2011/processed/'
 
@@ -141,8 +144,8 @@ def load_images():
     # Tried to use inplace here, but because I'm modifying I want copies of the data not the original
     train = train.drop('is_train',axis=1).set_index('image_id')
     test = test.drop('is_train',axis=1).set_index('image_id')
-    train['path'] = train['path'].map(lambda x: 'C:/datasets/CUB_200_2011/processed/data224/train/' + x)
-    test['path'] = test['path'].map(lambda x: 'C:/datasets/CUB_200_2011/processed/data224/test/' + x)
+    train['path'] = train['path'].map(lambda x: BASE + 'train/' + x)
+    test['path'] = test['path'].map(lambda x: BASE + 'test/' + x)
     return train, test
 
 def main():

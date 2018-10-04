@@ -9,8 +9,10 @@ import tensorflow as tf
 import os
 
 # Dataset Parameters
-TRAIN_PATH = 'C:/datasets/CUB_200_2011/processed/data224/train/train_data.txt'
-TEST_PATH = 'C:/datasets/CUB_200_2011/processed/data224/test/test_data.txt'
+BASE = '~/'
+# BASE = 'C:/datasets/CUB_200_2011/processed/data224/'
+TRAIN_PATH = BASE + 'train/train_data.txt'
+TEST_PATH = BASE + 'test/test_data.txt'
 
 # Image Parameters
 N_CLASSES = 200     # Total number of classes

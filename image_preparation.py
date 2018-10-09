@@ -2,9 +2,9 @@
 Based on https://www.kaggle.com/gauss256/preprocess-images
 
 By default this script will normalize the image luminance and resize to a
-square image of side length 224. The resizing preserves the aspect ratio and
+square image of side length 128. The resizing preserves the aspect ratio and
 adds gray bars as necessary to make them square. The resulting images are
-stored in a folder named data224.
+stored in a folder named data128.
 
 The location of the input and output files, and the size of the images, can be
 controlled through the processing parameters below.
@@ -20,10 +20,12 @@ from PIL import Image
 
 
 # Processing parameters
-SIZE = 224      # for ImageNet models compatibility
-BASE = '/Users/leaf/CS767/'
-# BASE = BASE + ''
+# SIZE was 224 for ImageNet models compatibility, but this may have been incorrect 
+# See https://cs231n.github.io/convolutional-networks/ under "Spatial arrangement"
+SIZE = 128
 
+# IMAGEFILE_PATH = '/Users/leaf/CS767/'
+IMAGEFILE_PATH = 'C:/datasets/CUB_200_2011/processed/data128/'
 DATA_PATH="C:/datasets/CUB_200_2011/CUB_200_2011/"
 OUTPUT_PATH = 'C:/datasets/CUB_200_2011/processed/'
 
@@ -102,13 +104,13 @@ def prep_images(image_data, out_dir):
     This code is modified from https://www.kaggle.com/gauss256/preprocess-images
     """
     for item in image_data.itertuples():
-        path = os.path.join(DATA_PATH, 'images', item.path)
+        path = os.path.join(DATA_PATH, 'images', item.file)
         img = Image.open(path)
         img = img.crop((item.left, item.upper, item.right, item.lower))
         img = resize_image(norm_image(img), SIZE)
-        bird_path = os.path.join(out_dir,os.path.dirname(item.path))
+        bird_path = os.path.join(out_dir,os.path.dirname(item.file))
         os.makedirs(bird_path, exist_ok=True)
-        full_image_path = os.path.join(bird_path, os.path.basename(item.path))
+        full_image_path = os.path.join(bird_path, os.path.basename(item.file))
         img.save(full_image_path)
 
 
@@ -117,9 +119,6 @@ def load_images():
     Load the image data from various files
     This code is my own
     """
-    # Goldfinches are 2670-2709
-    # START = 0      # inclusive
-    # END = 100      # inclusive
     # Read in the bounding boxes and image_ids
     boxes = pd.read_csv(DATA_PATH + "bounding_boxes.txt",' ',names=['image_id','left','upper','width','height'])
     # boxes = boxes[boxes['image_id'].between(START,END)]
@@ -133,7 +132,6 @@ def load_images():
     images = pd.merge(boxes,classes,on='image_id')
     # Read in the names of the image files, connect each to its image_id
     files = pd.read_csv(DATA_PATH + "images.txt",' ',names=['image_id','path'])
-    # files = files[files['image_id'].between(START,END)]
     images = pd.merge(images,files,on='image_id')
     # Merge with the train-test split indicators
     split = pd.read_csv(DATA_PATH + "train_test_split.txt",' ',names=['image_id','is_train'])
@@ -144,8 +142,10 @@ def load_images():
     # Tried to use inplace here, but because I'm modifying I want copies of the data not the original
     train = train.drop('is_train',axis=1).set_index('image_id')
     test = test.drop('is_train',axis=1).set_index('image_id')
-    train['path'] = train['path'].map(lambda x: BASE + 'train/' + x)
-    test['path'] = test['path'].map(lambda x: BASE + 'test/' + x)
+    train['file'] = train['path']
+    test['file'] = test['path']
+    train['path'] = train['path'].map(lambda x: IMAGEFILE_PATH + 'train/' + x)
+    test['path'] = test['path'].map(lambda x: IMAGEFILE_PATH + 'test/' + x)
     return train, test
 
 def main():
@@ -165,19 +165,19 @@ def main():
     os.makedirs(train_dir_out, exist_ok=True)
     os.makedirs(test_dir_out, exist_ok=True)
 
-    # Write the data to  files within each output directory
+    # Write the data to files within each output directory
     train.to_csv(os.path.join(train_dir_out, 'train_data.txt'), sep=' ', columns=['path','class_id'], header=False, index=False)
     test.to_csv(os.path.join(test_dir_out, 'test_data.txt'), sep=' ', columns=['path','class_id'], header=False, index=False)
 
     # Preprocess the training files
-    # procs = dict()
-    # procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
-    # procs[1].start()
-    # procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
-    # procs[2].start()
+    procs = dict()
+    procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
+    procs[1].start()
+    procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
+    procs[2].start()
 
-    # procs[1].join()
-    # procs[2].join()
+    procs[1].join()
+    procs[2].join()
 
 
 if __name__ == '__main__':

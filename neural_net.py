@@ -20,7 +20,7 @@ def train():
     # Image Parameters
     N_CLASSES = 200     # Total number of classes
     CHANNELS = 3        # The 3 color channels,
-    PIXELS = 224
+    PIXELS = 128
 
 
     def read_images(dataset_path, batch_size):
@@ -141,6 +141,7 @@ def train():
         threads = tf.train.start_queue_runners(coord=coord)
 
         # Training cycle
+        print("Starting training")
         for step in range(1, FLAGS.max_steps + 1):
 
             if step % FLAGS.display_steps == 0:
@@ -182,7 +183,7 @@ if __name__ == '__main__':
         '--file_dir',
         type=str,
         default='/Users/leaf/CS767/data128/',
-        # default='C:/datasets/CUB_200_2011/processed/data224/',
+        # default='C:/datasets/CUB_200_2011/processed/data128/',
         help='Base file directory')
     parser.add_argument(
         '--log_dir',

@@ -144,6 +144,7 @@ def train():
         print("Starting training")
         for step in range(1, FLAGS.max_steps + 1):
 
+            print('.', end='')
             if step % FLAGS.display_steps == 0:
                 # Run optimization and calculate batch loss and accuracy
                 _, loss, acc = sess.run([train_op, loss_op, accuracy])

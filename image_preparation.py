@@ -24,8 +24,8 @@ from PIL import Image
 # See https://cs231n.github.io/convolutional-networks/ under "Spatial arrangement"
 SIZE = 128
 
-# IMAGEFILE_PATH = '/Users/leaf/CS767/'
-IMAGEFILE_PATH = 'C:/datasets/CUB_200_2011/processed/data128/'
+IMAGEFILE_PATH = '/Users/leaf/CS767/data128/'
+# IMAGEFILE_PATH = 'C:/datasets/CUB_200_2011/processed/data128/'
 DATA_PATH="C:/datasets/CUB_200_2011/CUB_200_2011/"
 OUTPUT_PATH = 'C:/datasets/CUB_200_2011/processed/'
 
@@ -170,14 +170,14 @@ def main():
     test.to_csv(os.path.join(test_dir_out, 'test_data.txt'), sep=' ', columns=['path','class_id'], header=False, index=False)
 
     # Preprocess the training files
-    procs = dict()
-    procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
-    procs[1].start()
-    procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
-    procs[2].start()
+    # procs = dict()
+    # procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
+    # procs[1].start()
+    # procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
+    # procs[2].start()
 
-    procs[1].join()
-    procs[2].join()
+    # procs[1].join()
+    # procs[2].join()
 
 
 if __name__ == '__main__':

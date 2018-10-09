@@ -5,8 +5,6 @@ https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutoria
 
 """
 
-from __future__ import print_function
-
 import tensorflow as tf
 import os
 import argparse
@@ -144,7 +142,6 @@ def train():
         print("Starting training")
         for step in range(1, FLAGS.max_steps + 1):
 
-            print('.', end='')
             if step % FLAGS.display_steps == 0:
                 # Run optimization and calculate batch loss and accuracy
                 _, loss, acc = sess.run([train_op, loss_op, accuracy])
@@ -172,19 +169,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--max_steps', type=int, default=1000,
                         help='Number of steps to run trainer.')
-    parser.add_argument('--display_steps', type=int, default=20,
+    parser.add_argument('--display_steps', type=int, default=100,
                         help='Print status at intervals of this many steps.')
     parser.add_argument('--learning_rate', type=float, default=0.001,
                         help='Initial learning rate')
     parser.add_argument('--dropout', type=float, default=0.9,
                         help='Keep probability for training dropout.')
-    parser.add_argument('--batch_size', type=float, default=100,
+    parser.add_argument('--batch_size', type=float, default=200,
                         help='Batch size.')
     parser.add_argument(
         '--file_dir',
         type=str,
-        default='/Users/leaf/CS767/data128/',
-        # default='C:/datasets/CUB_200_2011/processed/data128/',
+        # default='/Users/leaf/CS767/data128/',
+        default='C:/datasets/CUB_200_2011/processed/data128/',
         help='Base file directory')
     parser.add_argument(
         '--log_dir',

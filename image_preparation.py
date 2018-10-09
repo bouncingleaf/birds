@@ -24,8 +24,8 @@ from PIL import Image
 # See https://cs231n.github.io/convolutional-networks/ under "Spatial arrangement"
 SIZE = 128
 
-IMAGEFILE_PATH = '/Users/leaf/CS767/data128/'
-# IMAGEFILE_PATH = 'C:/datasets/CUB_200_2011/processed/data128/'
+# IMAGEFILE_PATH = '/Users/leaf/CS767/data128/'
+IMAGEFILE_PATH = 'C:/datasets/CUB_200_2011/processed/data128/'
 DATA_PATH="C:/datasets/CUB_200_2011/CUB_200_2011/"
 OUTPUT_PATH = 'C:/datasets/CUB_200_2011/processed/'
 

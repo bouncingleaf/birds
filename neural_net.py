@@ -180,8 +180,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--file_dir',
         type=str,
-        # default='/Users/leaf/CS767/data128/',
-        default='C:/datasets/CUB_200_2011/processed/data128/',
+        default='/Users/leaf/CS767/data128/',
+        # default='C:/datasets/CUB_200_2011/processed/data128/',
         help='Base file directory')
     parser.add_argument(
         '--log_dir',

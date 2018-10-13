@@ -2,26 +2,16 @@ import os
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-import torchvision.transforms as transforms
-import torch.nn.functional as F
+# import torchvision.transforms as transforms
+# import torch.nn.functional as F
 import torchvision.datasets
 import numpy as np
 import pandas as pd
 from PIL import Image
+import argparse
+import sys
 
-# Constants
-HOME = '/Users/leaf/CS767/'
-TRAIN_PATH = os.path.join(HOME, 'train/')
-TEST_PATH = os.path.join(HOME, 'test/')
-PIXELS = 224
-
-# Hyperparameters
-num_epochs = 10
-num_classes = 200
-batch_size = 100
-learning_rate = 0.001
-
-MODEL_STORE_PATH = os.path.join(HOME, 'pytorch_models/')
+FLAGS = None
 
 class BirdDataset(Dataset):
     def __init__(self, csv_file, transform=None):
@@ -62,17 +52,11 @@ class ToTensor(object):
         return {'image': torch.from_numpy(image).type(torch.FloatTensor),
                 'label': torch.tensor(int(label)).type(torch.FloatTensor)}
 
-print("Building datasets...")
-TRAIN_CSV_FILE = os.path.join(TRAIN_PATH, 'train_data.txt')
-TEST_CSV_FILE = os.path.join(TEST_PATH, 'test_data.txt')
-train_dataset = BirdDataset(csv_file=TRAIN_CSV_FILE, transform=ToTensor())
-test_dataset = BirdDataset(csv_file=TEST_CSV_FILE, transform=ToTensor())
-train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
-
 class CNN(nn.Module):
     """ based on https://medium.com/ml2vec/intro-to-pytorch-with-image-classification-on-a-fashion-clothes-dataset-e589682df0c5 """
-    def __init__(self):
+    def __init__(self, image_size, num_classes):
+        this.image_size = image_size
+        this.num_classes = num_classes
         super(CNN, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=5, padding=2),
@@ -84,8 +68,8 @@ class CNN(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(PIXELS*PIXELS*2, PIXELS*2)
-        self.fc2 = nn.Linear(PIXELS*2, 200)
+        self.fc1 = nn.Linear(this.image_size*this.image_size*2, this.image_size*2)
+        self.fc2 = nn.Linear(this.image_size*2, this.num_classes)
         
     def forward(self, x):
         out = self.layer1(x)
@@ -95,63 +79,139 @@ class CNN(nn.Module):
         out = self.fc2(out)
         return out
 
-print("Initializing model")
-model = CNN()
-
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+def build_datasets(path, batch_size):
+    print("Building datasets...")
+    train_csv = os.path.join(path, 'train/train_data.txt')
+    test_csv = os.path.join(path, 'test/test_data.txt')
+    train_dataset = BirdDataset(csv_file=train_csv, transform=ToTensor())
+    test_dataset = BirdDataset(csv_file=test_csv, transform=ToTensor())
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+    return train_loader, test_loader
 
 # Train the model
-print("Training the model")
-total_step = len(train_loader)
-loss_list = []
-acc_list = []
-for epoch in range(num_epochs):
-    for i, data in enumerate(train_loader):
-        # Run the forward pass
-        outputs = model(data['image'])
-        labels = data['label'].type(torch.LongTensor)
-        loss = criterion(outputs, labels)
-        loss_list.append(loss.item())
+def train(model, train_loader, num_epochs, learning_rate, display_every):
+    print("Training the model")
 
-        # Backprop and perform Adam optimisation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    total_step = len(train_loader)
+    loss_list = []
+    acc_list = []
 
-        # Track the accuracy
-        total = labels.size(0)
-        _, predicted = torch.max(outputs.data, 1)
-        correct = (predicted == labels).sum().item()
-        acc_list.append(correct / total)
+    for epoch in range(num_epochs):
+        for i, data in enumerate(train_loader):
+            # Run the forward pass
+            outputs = model(data['image'])
+            labels = data['label'].type(torch.LongTensor)
+            loss = criterion(outputs, labels)
+            loss_list.append(loss.item())
 
-        if (i + 1) % 50 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
-                  .format(epoch + 1, num_epochs, i + 1, total_step, loss.item(),
-                          (correct / total) * 100))
+            # Backprop and perform Adam optimisation
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            # Track the accuracy
+            total = labels.size(0)
+            _, predicted = torch.max(outputs.data, 1)
+            correct = (predicted == labels).sum().item()
+            acc_list.append(correct / total)
+
+            if (i + 1) % display_every == 0:
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
+                      .format(epoch + 1, num_epochs, i + 1, total_step, loss.item(),
+                              (correct / total) * 100))
+    return loss_list, acc_list
 
 # Test the model
-model.eval()
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for data in test_loader:
-        outputs = model(data['image'])
-        _, predicted = torch.max(outputs.data, 1)
-        labels = data['label']
-        total += labels.size(0)
-        print(predicted, labels)
-        correct += (predicted == labels).sum().item()
+def test(model, test_loader):
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for data in test_loader:
+            outputs = model(data['image'])
+            _, predicted = torch.max(outputs.data, 1)
+            labels = data['label']
+            total += labels.size(0)
+            print(predicted, labels)
+            correct += (predicted == labels).sum().item()
 
-    print('Test Accuracy of the model on the test images: {} %'.format((correct / total) * 100))
+        print('Accuracy on the test images: {} %'.format((correct / total) * 100))
 
-# Save the model and plot
-torch.save(model.state_dict(), MODEL_STORE_PATH + 'conv_net_model2.ckpt')
 
-p = figure(y_axis_label='Loss', width=850, y_range=(0, 1), title='PyTorch ConvNet results')
-p.extra_y_ranges = {'Accuracy': Range1d(start=0, end=100)}
-p.add_layout(LinearAxis(y_range_name='Accuracy', axis_label='Accuracy (%)'), 'right')
-p.line(np.arange(len(loss_list)), loss_list)
-p.line(np.arange(len(loss_list)), np.array(acc_list) * 100, y_range_name='Accuracy', color='red')
-show(p)
+def plot(loss_list, acc_list):
+    p = figure(y_axis_label='Loss', width=850, y_range=(0, 1), title='ConvNet results')
+    p.extra_y_ranges = {'Accuracy': Range1d(start=0, end=100)}
+    p.add_layout(LinearAxis(y_range_name='Accuracy', axis_label='Accuracy (%)'), 'right')
+    p.line(np.arange(len(loss_list)), loss_list)
+    p.line(np.arange(len(loss_list)), 
+           np.array(acc_list) * 100,
+           y_range_name='Accuracy',
+           color='red')
+    show(p)
+
+def get_dirs(image, output):
+    # These are my directory names on my testing system (a Mac)
+    # The defaults in FLAGS are my directory names on my coding system (my Windows laptop)
+    # You can override them both with --image_dir and --output_dir
+    IMAGE_BASE = '/Users/leaf/CS767/data128/' 
+    OUTPUT_BASE = '/Users/leaf/CS767/birds/output'
+
+    image_dir = IMAGE_BASE if os.path.exists(IMAGE_BASE) else image_dir = image
+    output_dir = OUTPUT_BASE if os.path.exists(OUTPUT_BASE) else output_dir = output
+    if not os.path.exists(image_dir):
+        print("Not a valid image directory {}, try using --image_dir flag".format(image_dir))
+        return None, None
+    if not os.path.exists(output_dir):
+        print("Not a valid output directory {}, try using --output_dir flag".format(output_dir))
+        return None, None
+    else:
+        return image_dir, output_dir
+
+def main():
+    IMAGE_SIZE = 128
+    NUM_CLASSES = 200
+    MODEL_FILE = 'models/nn_20181013.ckpt'
+    image, output = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
+    if image and output:
+        train_loader, test_loader = build_datasets(image, FLAGS.batch_size)
+        model = CNN(IMAGE_SIZE, NUM_CLASSES)
+        loss_list, acc_list = train(
+            model, 
+            train_loader, 
+            FLAGS.epochs, 
+            FLAGS.learning_rate, 
+            FLAGS.display_every)
+        model.eval()
+        test(model, test_loader)
+        torch.save(model.state_dict(), os.path.join(output, model_file))
+        plot(loss_list, acc_list)
+
+
+if __name__ == '__main__':
+    # based on code from 
+    # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--epochs', type=int, default=10,
+                        help='Number of epochs to run trainer.')
+    parser.add_argument('--display_every', type=int, default=20,
+                        help='Print status at intervals of this many steps.')
+    parser.add_argument('--learning_rate', type=float, default=0.001,
+                        help='Initial learning rate')
+    # parser.add_argument('--dropout', type=float, default=0.9,
+    #                     help='Keep probability for training dropout.')
+    parser.add_argument('--batch_size', type=float, default=100,
+                        help='Batch size.')
+    parser.add_argument(
+        '--image_dir',
+        type=str,
+        default='C:/datasets/CUB_200_2011/processed/data128/',
+        help='Where to find the processed images')
+    parser.add_argument(
+        '--output_dir',
+        type=str,
+        default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output',
+        help='Where to store the output from this program')
+    FLAGS, unparsed = parser.parse_known_args()
+    tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)

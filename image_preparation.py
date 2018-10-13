@@ -171,13 +171,13 @@ def main():
 
     # Preprocess the training files
     # Comment this section out in order to just rebuild the train_data and test_data text files
-    # procs = dict()
-    # procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
-    # procs[1].start()
-    # procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
-    # procs[2].start()
-    # procs[1].join()
-    # procs[2].join()
+    procs = dict()
+    procs[1] = Process(target=prep_images, args=(train, train_dir_out, ))
+    procs[1].start()
+    procs[2] = Process(target=prep_images, args=(test, test_dir_out, ))
+    procs[2].start()
+    procs[1].join()
+    procs[2].join()
 
 
 if __name__ == '__main__':

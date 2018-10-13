@@ -1,0 +1,55 @@
+Training with batch size 100, learning rate 0.001, dropout 0.9, steps 1000
+2018-10-09 13:35:00.443905: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX AVX2
+Starting training
+....................Step 20, Minibatch Loss= 5.2978, Training Accuracy= 0.010
+....................Step 40, Minibatch Loss= 5.3000, Training Accuracy= 0.020
+....................Step 60, Minibatch Loss= 5.3051, Training Accuracy= 0.000
+....................Step 80, Minibatch Loss= 5.2483, Training Accuracy= 0.010
+....................Step 100, Minibatch Loss= 5.2698, Training Accuracy= 0.010
+....................Step 120, Minibatch Loss= 5.2909, Training Accuracy= 0.030
+....................Step 140, Minibatch Loss= 5.1606, Training Accuracy= 0.050
+....................Step 160, Minibatch Loss= 5.1137, Training Accuracy= 0.010
+....................Step 180, Minibatch Loss= 5.0310, Training Accuracy= 0.020
+....................Step 200, Minibatch Loss= 4.6175, Training Accuracy= 0.060
+....................Step 220, Minibatch Loss= 4.3556, Training Accuracy= 0.040
+....................Step 240, Minibatch Loss= 4.7254, Training Accuracy= 0.050
+....................Step 260, Minibatch Loss= 4.1270, Training Accuracy= 0.080
+....................Step 280, Minibatch Loss= 3.9051, Training Accuracy= 0.110
+....................Step 300, Minibatch Loss= 4.0349, Training Accuracy= 0.070
+....................Step 320, Minibatch Loss= 3.5596, Training Accuracy= 0.080
+....................Step 340, Minibatch Loss= 3.4213, Training Accuracy= 0.100
+....................Step 360, Minibatch Loss= 3.2914, Training Accuracy= 0.100
+....................Step 380, Minibatch Loss= 2.9876, Training Accuracy= 0.040
+....................Step 400, Minibatch Loss= 2.7555, Training Accuracy= 0.130
+....................Step 420, Minibatch Loss= 2.4629, Training Accuracy= 0.150
+....................Step 440, Minibatch Loss= 2.6910, Training Accuracy= 0.060
+....................Step 460, Minibatch Loss= 2.4405, Training Accuracy= 0.090
+....................Step 480, Minibatch Loss= 2.5806, Training Accuracy= 0.130
+....................Step 500, Minibatch Loss= 1.9238, Training Accuracy= 0.060
+....................Step 520, Minibatch Loss= 2.0247, Training Accuracy= 0.060
+....................Step 540, Minibatch Loss= 1.6311, Training Accuracy= 0.090
+....................Step 560, Minibatch Loss= 1.5276, Training Accuracy= 0.120
+....................Step 580, Minibatch Loss= 1.9210, Training Accuracy= 0.080
+....................Step 600, Minibatch Loss= 1.4529, Training Accuracy= 0.150
+....................Step 620, Minibatch Loss= 0.9408, Training Accuracy= 0.150
+....................Step 640, Minibatch Loss= 1.1061, Training Accuracy= 0.070
+....................Step 660, Minibatch Loss= 1.1612, Training Accuracy= 0.070
+....................Step 680, Minibatch Loss= 1.2664, Training Accuracy= 0.120
+....................Step 700, Minibatch Loss= 1.1594, Training Accuracy= 0.080
+....................Step 720, Minibatch Loss= 0.8138, Training Accuracy= 0.150
+....................Step 740, Minibatch Loss= 1.1100, Training Accuracy= 0.130
+....................Step 760, Minibatch Loss= 1.0233, Training Accuracy= 0.090
+....................Step 780, Minibatch Loss= 0.5465, Training Accuracy= 0.060
+....................Step 800, Minibatch Loss= 1.0764, Training Accuracy= 0.110
+....................Step 820, Minibatch Loss= 0.8328, Training Accuracy= 0.080
+....................Step 840, Minibatch Loss= 0.8004, Training Accuracy= 0.070
+....................Step 860, Minibatch Loss= 0.7547, Training Accuracy= 0.110
+....................Step 880, Minibatch Loss= 0.6579, Training Accuracy= 0.060
+....................Step 900, Minibatch Loss= 0.4924, Training Accuracy= 0.140
+....................Step 920, Minibatch Loss= 0.5739, Training Accuracy= 0.130
+....................Step 940, Minibatch Loss= 0.9316, Training Accuracy= 0.080
+....................Step 960, Minibatch Loss= 0.8745, Training Accuracy= 0.110
+....................Step 980, Minibatch Loss= 0.4816, Training Accuracy= 0.070
+....................Step 1000, Minibatch Loss= 0.6207, Training Accuracy= 0.120
+
+

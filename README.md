@@ -1,13 +1,13 @@
 # Jessica Roy's Final Project for MET CS 767
 
+## About
+
+This is Jessica Roy's Final Project for Boston University MET CS 602 online, Professor Eric Braude, fall term 1 of 2018. It is a convolutional neural network to classify bird images from the CUB-200-2011 dataset by species.
+
 ## Contents
 
 - nn.py - The neural net
 - image_preparation.py - The program for preparing the images. It takes a few minutes to run, and it only needs to be run once.
-
-## About
-
-This is Jessica Roy's Final Project for Boston University MET CS 602 online, Professor Eric Braude, fall term 1 of 2018. It is a convolutional neural network to classify bird images from the CUB-200-2011 dataset by species.
 
 ## Running
 

@@ -14,7 +14,7 @@ import sys
 FLAGS = None
 
 class BirdDataset(Dataset):
-    def __init__(self, csv_file, image_path, transform=None):
+    def __init__(self, image_path, csv_file, transform=None):
 
         """
         Args:
@@ -83,8 +83,8 @@ def build_datasets(path, batch_size):
     print("Building datasets...")
     train_csv = os.path.join(path, 'train/train_data.txt')
     test_csv = os.path.join(path, 'test/test_data.txt')
-    train_dataset = BirdDataset(csv_file=train_csv, path, transform=ToTensor())
-    test_dataset = BirdDataset(csv_file=test_csv, path, transform=ToTensor())
+    train_dataset = BirdDataset(path, csv_file=train_csv, transform=ToTensor())
+    test_dataset = BirdDataset(path, csv_file=test_csv, transform=ToTensor())
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
     return train_loader, test_loader

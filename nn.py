@@ -158,8 +158,14 @@ def get_dirs(image, output):
     IMAGE_BASE = '/Users/leaf/CS767/data128/' 
     OUTPUT_BASE = '/Users/leaf/CS767/birds/output'
 
-    image_dir = IMAGE_BASE if os.path.exists(IMAGE_BASE) else image_dir = image
-    output_dir = OUTPUT_BASE if os.path.exists(OUTPUT_BASE) else output_dir = output
+    if os.path.exists(IMAGE_BASE):
+        image_dir = IMAGE_BASE 
+    else:
+        image_dir = image
+    if os.path.exists(OUTPUT_BASE):
+        output_dir = OUTPUT_BASE 
+    else:
+        output_dir = output
     if not os.path.exists(image_dir):
         print("Not a valid image directory {}, try using --image_dir flag".format(image_dir))
         return None, None

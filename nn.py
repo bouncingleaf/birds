@@ -14,7 +14,7 @@ import sys
 FLAGS = None
 
 class BirdDataset(Dataset):
-    def __init__(self, csv_file, transform=None):
+    def __init__(self, csv_file, transform=None, image_path):
 
         """
         Args:
@@ -30,7 +30,7 @@ class BirdDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = self.birds.iloc[idx, 0]
-        img = Image.open(img_name)
+        img = Image.open(os.path.join(image_path, img_name))
         img = np.array(img)
         label = self.birds.iloc[idx, 1]
         sample = {'image': img, 'label': label}
@@ -83,8 +83,8 @@ def build_datasets(path, batch_size):
     print("Building datasets...")
     train_csv = os.path.join(path, 'train/train_data.txt')
     test_csv = os.path.join(path, 'test/test_data.txt')
-    train_dataset = BirdDataset(csv_file=train_csv, transform=ToTensor())
-    test_dataset = BirdDataset(csv_file=test_csv, transform=ToTensor())
+    train_dataset = BirdDataset(csv_file=train_csv, transform=ToTensor(), path)
+    test_dataset = BirdDataset(csv_file=test_csv, transform=ToTensor(), path)
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
     return train_loader, test_loader
@@ -179,9 +179,9 @@ def main():
     IMAGE_SIZE = 128
     NUM_CLASSES = 200
     MODEL_FILE = 'models/nn_20181013.ckpt'
-    image, output = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
-    if image and output:
-        train_loader, test_loader = build_datasets(image, FLAGS.batch_size)
+    image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
+    if image_dir and output_dir:
+        train_loader, test_loader = build_datasets(image_dir, FLAGS.batch_size)
         model = CNN(IMAGE_SIZE, NUM_CLASSES)
         loss_list, acc_list = train(
             model, 
@@ -191,7 +191,7 @@ def main():
             FLAGS.display_every)
         model.eval()
         test(model, test_loader)
-        torch.save(model.state_dict(), os.path.join(output, model_file))
+        torch.save(model.state_dict(), os.path.join(output_dir, model_file))
         plot(loss_list, acc_list)
 
 

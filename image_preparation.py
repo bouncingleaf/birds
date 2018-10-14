@@ -153,10 +153,10 @@ def finish(frame, folder):
     frame = frame.drop('is_train',axis=1).set_index('image_id')
     # add the flipped file names
     frame2 = frame.copy()
-    frame2['path'] = frame2['path'].map(lambda x: os.path.join(os.path.dirname(x),'2_' + os.path.basename(x)))
+    frame2['path'] = frame2['path'].map(lambda x: os.path.dirname(x) + '/2_' + os.path.basename(x))
     frame = pd.concat([frame, frame2])
     frame['file'] = frame['path']
-    frame['path'] = frame['path'].map(lambda x: IMAGE_PATH + folder + x)
+    frame['path'] = frame['path'].map(lambda x: folder + x)
     return frame
 
 def main():

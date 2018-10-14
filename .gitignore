@@ -19,6 +19,7 @@ node_modules
 .c9/
 *.launch
 .settings/
+.ipynb_checkpoints/
 *.sublime-workspace
 
 # IDE - VSCode

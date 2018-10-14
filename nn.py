@@ -55,8 +55,8 @@ class ToTensor(object):
 class CNN(nn.Module):
     """ based on https://medium.com/ml2vec/intro-to-pytorch-with-image-classification-on-a-fashion-clothes-dataset-e589682df0c5 """
     def __init__(self, image_size, num_classes):
-        this.image_size = image_size
-        this.num_classes = num_classes
+        self.image_size = image_size
+        self.num_classes = num_classes
         super(CNN, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=5, padding=2),
@@ -68,8 +68,8 @@ class CNN(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(this.image_size*this.image_size*2, this.image_size*2)
-        self.fc2 = nn.Linear(this.image_size*2, this.num_classes)
+        self.fc1 = nn.Linear(self.image_size*self.image_size*2, self.image_size*2)
+        self.fc2 = nn.Linear(self.image_size*2, self.num_classes)
         
     def forward(self, x):
         out = self.layer1(x)

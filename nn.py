@@ -2,8 +2,8 @@ import os
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-# import torchvision.transforms as transforms
-# import torch.nn.functional as F
+import torchvision.transforms as transforms
+import torch.nn.functional as F
 import torchvision.datasets
 import numpy as np
 import pandas as pd
@@ -220,4 +220,4 @@ if __name__ == '__main__':
         default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output',
         help='Where to store the output from this program')
     FLAGS, unparsed = parser.parse_known_args()
-    tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+    main()

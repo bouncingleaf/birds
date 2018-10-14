@@ -22,6 +22,7 @@ class BirdDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
+        self.image_path = image_path
         self.birds = pd.read_csv(csv_file, sep=' ', names=['path','class_id'])
         self.transform = transform
 
@@ -30,7 +31,7 @@ class BirdDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = self.birds.iloc[idx, 0]
-        img = Image.open(os.path.join(image_path, img_name))
+        img = Image.open(os.path.join(self.image_path, img_name))
         img = np.array(img)
         label = self.birds.iloc[idx, 1]
         sample = {'image': img, 'label': label}

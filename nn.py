@@ -58,19 +58,20 @@ class CNN(nn.Module):
     def __init__(self, image_size, num_classes):
         self.image_size = image_size
         self.num_classes = num_classes
+        self.hidden_layer = 400
         super(CNN, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 16, kernel_size=5, padding=2),
-            nn.BatchNorm2d(16),
-            nn.ReLU(),
-            nn.MaxPool2d(2))
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=5, padding=2),
+            nn.Conv2d(3, 32, kernel_size=5, padding=2),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(self.image_size*self.image_size*2, self.image_size*2)
-        self.fc2 = nn.Linear(self.image_size*2, self.num_classes)
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=5, padding=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2))
+        self.fc1 = nn.Linear(, self.hidden_layer)
+        self.fc2 = nn.Linear(self.hidden_layer, self.num_classes)
         
     def forward(self, x):
         out = self.layer1(x)
@@ -78,10 +79,10 @@ class CNN(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
         out = self.fc2(out)
+        # Apply softmax here?
         return out
 
 def build_datasets(path, batch_size):
-    print("Building datasets...")
     train_csv = os.path.join(path, 'train/train_data.txt')
     test_csv = os.path.join(path, 'test/test_data.txt')
     train_dataset = BirdDataset(path, csv_file=train_csv, transform=ToTensor())
@@ -92,8 +93,6 @@ def build_datasets(path, batch_size):
 
 # Train the model
 def train(model, train_loader, num_epochs, learning_rate, display_every):
-    print("Training the model")
-
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     total_step = len(train_loader)
@@ -177,23 +176,36 @@ def get_dirs(image, output):
         return image_dir, output_dir
 
 def main():
+    print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 200
-    MODEL_FILE = 'models/nn_20181013.ckpt'
+    MODEL_FILE = os.path.join(output_dir, 'models/nn_20181014.ckpt')
     image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
     if image_dir and output_dir:
+
+        print("Building datasets from {} with batch size={}...".format(image_dir, FLAGS.batch_size))
         train_loader, test_loader = build_datasets(image_dir, FLAGS.batch_size)
         model = CNN(IMAGE_SIZE, NUM_CLASSES)
+        
+        print("Training the model with learning rate {}...".format(FLAGS.learning_rate))
         loss_list, acc_list = train(
             model, 
             train_loader, 
             FLAGS.epochs, 
             FLAGS.learning_rate, 
             FLAGS.display_every)
+
+        print("Testing the model...")
         model.eval()
         test(model, test_loader)
-        torch.save(model.state_dict(), os.path.join(output_dir, model_file))
+
+        print("Saving the model to {}...".format(MODEL_FILE))
+        torch.save(model.state_dict(), MODEL_FILE)
+
+        print("Attempting a plot...")
         plot(loss_list, acc_list)
+
+        print("Done!")
 
 
 if __name__ == '__main__':

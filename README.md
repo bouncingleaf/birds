@@ -20,3 +20,19 @@ This is Jessica Roy's Final Project for Boston University MET CS 602 online, Pro
 
 You can comment out the "procs" section  near the end of image_preparation.py in order to rebuild the text file without re-cropping the images. Much faster!
 
+## Results
+
+### Round 1
+Training accuracy remained 0.00 no matter how many epochs, and the test part of the algorithm crashed. Hmm.
+
+### Round 2
+Increased batch size (I think it was from 3 to 100). Training accuracy began to improve! But it got suspiciously high. 100% after five epochs. And the test part of the algorithm still crashed. 
+
+### Round 3
+Fixed the crash in the test algorithm, and testing accuracy was around 5%. Sounds like overfitting to me.
+
+### Round 4
+Flipped the images and rotated them slightly and cropped them slightly differently to make twice as many training examples. Training accuracy still suspiciously high:
+    Epoch [6/6], Step [120/120], Loss: 0.5243, Accuracy: 87.50%
+The test part of my algorithm crashed again... on a print statement, no less.
+

@@ -70,7 +70,7 @@ class CNN(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(, self.hidden_layer)
+        self.fc1 = nn.Linear(64*32*32, self.hidden_layer)
         self.fc2 = nn.Linear(self.hidden_layer, self.num_classes)
         
     def forward(self, x):
@@ -132,7 +132,7 @@ def test(model, test_loader):
         for data in test_loader:
             outputs = model(data['image'])
             _, predicted = torch.max(outputs.data, 1)
-            labels = data['label']
+            labels = data['label'].type(torch.LongTensor)
             total += labels.size(0)
             print(predicted, labels)
             correct += (predicted == labels).sum().item()
@@ -158,13 +158,11 @@ def get_dirs(image, output):
     IMAGE_BASE = '/Users/leaf/CS767/data128/' 
     OUTPUT_BASE = '/Users/leaf/CS767/birds/output'
 
-    if os.path.exists(IMAGE_BASE):
-        image_dir = IMAGE_BASE 
-    else:
+    image_dir = IMAGE_BASE 
+    output_dir = OUTPUT_BASE 
+    if not os.path.exists(IMAGE_BASE):
         image_dir = image
-    if os.path.exists(OUTPUT_BASE):
-        output_dir = OUTPUT_BASE 
-    else:
+    if not os.path.exists(OUTPUT_BASE):
         output_dir = output
     if not os.path.exists(image_dir):
         print("Not a valid image directory {}, try using --image_dir flag".format(image_dir))
@@ -179,10 +177,10 @@ def main():
     print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 200
-    MODEL_FILE = os.path.join(output_dir, 'models/nn_20181014.ckpt')
     image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
     if image_dir and output_dir:
 
+        MODEL_FILE = os.path.join(output_dir, 'models/nn_20181014.ckpt')
         print("Building datasets from {} with batch size={}...".format(image_dir, FLAGS.batch_size))
         train_loader, test_loader = build_datasets(image_dir, FLAGS.batch_size)
         model = CNN(IMAGE_SIZE, NUM_CLASSES)

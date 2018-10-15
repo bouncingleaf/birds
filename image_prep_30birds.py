@@ -99,40 +99,39 @@ def resize_image(img, size):
     return img_pad
 
 
-def prep_images(items, out_dir):
+def prep_images(image_data, out_dir):
     """
     Preprocess images
 
     Reads images in items, and writes to out_dir
     This code is modified from https://www.kaggle.com/gauss256/preprocess-images
     """
-    for count, item in enumerate(items):
-        if count % 100 == 0:
-            print(item)
-        path = os.path.join(DATA_PATH, item.path)
-        img = Image.open(path)
-        img1 = img.crop((item.left, item.upper, item.right, item.lower))
-        img1 = resize_image(norm_image(img1), SIZE)
-        bird_path = os.path.join(out_dir,os.path.dirname(item.file))
-        os.makedirs(bird_path, exist_ok=True)
-        full_image_path = os.path.join(bird_path, os.path.basename(item.file))
-        img1.save(full_image_path)
-        # flip the image and modify it a little
-        full_image_path2 = os.path.join(bird_path, "2_" + os.path.basename(item.file))
-        img2 = img.rotate(2).crop((item.left+3,item.upper+3,item.right+3,item.lower+3))
-        img2 = img2.transpose(Image.FLIP_LEFT_RIGHT)
-        img2 = resize_image(norm_image(img2), SIZE)
-        img2.save(full_image_path2)
+    for item in image_data.itertuples():
+        path = os.path.join(DATA_PATH, "images/", item.path)
+        if os.path.exists(path):
+            img = Image.open(path)
+            img1 = img.crop((item.left, item.upper, item.right, item.lower))
+            img1 = resize_image(norm_image(img1), SIZE)
+            bird_path = os.path.join(out_dir,os.path.dirname(item.path))
+            os.makedirs(bird_path, exist_ok=True)
+            full_image_path = os.path.join(bird_path, os.path.basename(item.path))
+            img1.save(full_image_path)
+            # flip the image and modify it a little
+            full_image_path2 = os.path.join(bird_path, "2_" + os.path.basename(item.path))
+            img2 = img.rotate(2).crop((item.left+3,item.upper+3,item.right+3,item.lower+3))
+            img2 = img2.transpose(Image.FLIP_LEFT_RIGHT)
+            img2 = resize_image(norm_image(img2), SIZE)
+            img2.save(full_image_path2)
+        else:
+            print("Could not find {}".format(path))
 
 
-def load(file, frame, folder):
+def load(test_or_train):
     # add the flipped file names
-    frame = pd.read_csv(file)
+    frame = pd.read_csv(DATA_PATH + "all_" + test_or_train + ".txt")
     frame2 = frame.copy()
     frame2['path'] = frame2['path'].map(lambda x: os.path.dirname(x) + '/2_' + os.path.basename(x))
     frame = pd.concat([frame, frame2])
-    frame['file'] = frame['path']
-    frame['path'] = frame['path'].map(lambda x: folder + x)
     return frame
 
 def main():
@@ -142,7 +141,7 @@ def main():
     This code is modified from https://www.kaggle.com/gauss256/preprocess-images
     """
     # load Pandas dataframes with all the image data
-    train, test = (load(DATA_PATH + "all_train.txt"), load(DATA_PATH + "all_test.txt"))
+    train, test = load("train"), load("test")
     print('Image data loaded')
 
     # Make the output directories
@@ -152,8 +151,9 @@ def main():
     os.makedirs(test_dir_out, exist_ok=True)
 
     # Write the data to files within each output directory
-    train.to_csv(os.path.join(train_dir_out, 'train_data.txt'), sep=' ', columns=['path','class_id'], header=False, index=False)
-    test.to_csv(os.path.join(test_dir_out, 'test_data.txt'), sep=' ', columns=['path','class_id'], header=False, index=False)
+    train.to_csv(os.path.join(train_dir_out, 'train_data.txt'), sep=' ', columns=['path','id'], header=False, index=False)
+    test.to_csv(os.path.join(test_dir_out, 'test_data.txt'), sep=' ', columns=['path','id'], header=False, index=False)
+    print("Wrote the data files")
 
     # Preprocess the training files
     # Comment this section out in order to just rebuild the train_data and test_data text files

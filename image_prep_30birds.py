@@ -123,6 +123,7 @@ def prep_images(image_data, out_dir):
             img2 = resize_image(norm_image(img2), SIZE)
             img2.save(full_image_path2)
         else:
+            # Oh nooo, I prevent them from generating images but they still wind up in the data file!
             print("Could not find {}".format(path))
 
 

@@ -77,18 +77,18 @@ class CNN(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(2))
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1, stride=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.MaxPool2d(2))
+        # self.layer3 = nn.Sequential(
+        #     nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1, stride=1),
+        #     nn.BatchNorm2d(128),
+        #     nn.ReLU(),
+        #     nn.MaxPool2d(2))
         self.fc1 = nn.Linear(256*16*16, self.hidden_layer)
         self.fc2 = nn.Linear(self.hidden_layer, self.num_classes)
         
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
-        out = self.layer3(out)
+        # out = self.layer3(out)
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
         out = self.fc2(out)
@@ -117,6 +117,7 @@ def train(model, train_loader, num_epochs, learning_rate, display_every):
             # Run the forward pass
             outputs = model(data['image'])
             labels = data['label'].type(torch.LongTensor)
+            print(outputs, labels)
             loss = criterion(outputs, labels)
             loss_list.append(loss.item())
 
@@ -171,13 +172,16 @@ def main(
     print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
+    LOCAL = True
 
-    image_dir='/Users/leaf/CS767/30birds128/'
-    output_dir='/Users/leaf/CS767/birds/output/'
-    model_file='/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
-    # image_dir='C:/datasets/Combined/processed/30birds128/',
-    # output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/',
-    # model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'
+    if LOCAL:
+        image_dir='C:/datasets/Combined/processed/30birds128/'
+        output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
+        model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'
+    else:
+        image_dir='/Users/leaf/CS767/30birds128/'
+        output_dir='/Users/leaf/CS767/birds/output/'
+        model_file='/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
 
     if FLAGS:
         epochs = FLAGS.epochs

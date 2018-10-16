@@ -12,8 +12,6 @@ import argparse
 import sys
 import matplotlib.pyplot as plt
 
-FLAGS = None
-
 class BirdDataset(Dataset):
     def __init__(self, image_path, csv_file, transform=None):
 
@@ -82,7 +80,7 @@ class CNN(nn.Module):
         #     nn.BatchNorm2d(128),
         #     nn.ReLU(),
         #     nn.MaxPool2d(2))
-        self.fc1 = nn.Linear(256*16*16, self.hidden_layer)
+        self.fc1 = nn.Linear(64*32*32, self.hidden_layer)
         self.fc2 = nn.Linear(self.hidden_layer, self.num_classes)
         
     def forward(self, x):
@@ -94,6 +92,8 @@ class CNN(nn.Module):
         out = self.fc2(out)
         # Apply softmax here?
         # return F.log_softmax(out, dim=1)
+
+        return out
 
 def build_datasets(path, batch_size):
     train_csv = os.path.join(path, 'train/train_data.txt')
@@ -117,7 +117,6 @@ def train(model, train_loader, num_epochs, learning_rate, display_every):
             # Run the forward pass
             outputs = model(data['image'])
             labels = data['label'].type(torch.LongTensor)
-            print(outputs, labels)
             loss = criterion(outputs, labels)
             loss_list.append(loss.item())
 
@@ -164,58 +163,47 @@ def plot(loss_list, acc_list):
            color='red')
     show(p)
 
-def main(
-        epochs=10,
-        display_every=50, 
-        learning_rate=0.001,
-        batch_size=100):
+def main(epochs, display_every, learning_rate, batch_size):
     print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
-    LOCAL = True
 
-    if LOCAL:
-        image_dir='C:/datasets/Combined/processed/30birds128/'
-        output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
-        model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'
-    else:
-        image_dir='/Users/leaf/CS767/30birds128/'
-        output_dir='/Users/leaf/CS767/birds/output/'
-        model_file='/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
+    HOME = True
 
-    if FLAGS:
-        epochs = FLAGS.epochs
-        display_every = FLAGS.display_every
-        learning_rate = FLAGS.learning_rate
-        batch_size = FLAGS.batch_size
+    if HOME:
+        image_dir = 'C:/datasets/Combined/processed/30birds128/'
+        output_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
+        model_file = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'
+    else: 
+        image_dir = '/Users/Leaf/CS767/30birds128/'
+        output_dir = '/Users/Leaf/CS767/birds/output/'
+        model_file = '/Users/Leaf/CS767/birds/models/nn_30birds.ckpt'
 
-    if image_dir and output_dir:
+    print("Running with epochs={}, disp={}, learning_rate={}, batch_size={}\nimage_dir={}\n output_dir={}\n model_file={}"
+    .format(epochs, display_every, learning_rate, batch_size, image_dir, output_dir, model_file))
 
-        print("Running with epochs={}, disp={}, learning_rate={}, batch_size={},\nimage_dir={}, output_dir={}, model_file={}"
-        .format(epochs, display_every, learning_rate, batch_size, image_dir, output_dir, model_file))
+    train_loader, test_loader = build_datasets(image_dir, int(batch_size))
+    model = CNN(IMAGE_SIZE, NUM_CLASSES)
     
-        train_loader, test_loader = build_datasets(image_dir, int(batch_size))
-        model = CNN(IMAGE_SIZE, NUM_CLASSES)
-        
-        print("Training the model with learning rate {} for {} epochs...".format(learning_rate, epochs))
-        loss_list, acc_list = train(
-            model, 
-            train_loader, 
-            epochs, 
-            learning_rate, 
-            display_every)
+    print("Training the model with learning rate {} for {} epochs...".format(learning_rate, epochs))
+    loss_list, acc_list = train(
+        model, 
+        train_loader, 
+        epochs, 
+        learning_rate, 
+        display_every)
 
-        print("Testing the model...")
-        model.eval()
-        test(model, test_loader)
+    print("Testing the model...")
+    model.eval()
+    test(model, test_loader)
 
-        print("Saving the model to {}...".format(model_file))
-        torch.save(model.state_dict(), model_file)
+    print("Saving the model to {}...".format(model_file))
+    torch.save(model.state_dict(), model_file)
 
-        print("Attempting a plot...")
-        plot(loss_list, acc_list)
+    print("Attempting a plot...")
+    plot(loss_list, acc_list)
 
-        print("Done!")
+    print("Done!")
 
 if __name__ == '__main__':
     # based on code from 
@@ -231,5 +219,20 @@ if __name__ == '__main__':
     #                     help='Keep probability for training dropout.')
     parser.add_argument('--batch_size', type=float, default=100,
                         help='Batch size.')
+    parser.add_argument(
+        '--image_dir',
+        type=str,
+        default='C:/datasets/Combined/processed/30birds128/',
+        help='Where to find the processed images')
+    parser.add_argument(
+        '--output_dir',
+        type=str,
+        default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/',
+        help='Where to store the output from this program')
+    parser.add_argument(
+        '--model_file',
+        type=str,
+        default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt',
+        help='Where to store the output from this program')
     FLAGS, unparsed = parser.parse_known_args()
-    main()
+    main(FLAGS.epochs, FLAGS.display_every, FLAGS.learning_rate, FLAGS.batch_size)

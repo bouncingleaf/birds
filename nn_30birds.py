@@ -14,28 +14,6 @@ import matplotlib.pyplot as plt
 
 FLAGS = None
 
-# class Params():
-#     def __init__(self,
-#         epochs=10,
-#         display_every=50, 
-#         learning_rate=0.001,
-#         batch_size=100,
-#         image_dir='C:/datasets/Combined/processed/30birds128/',
-#         output_dir='C:/datasets/Combined/processed/30birds128/output',
-#         model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'):
-#         self.epochs = epochs
-#         self.display_every = display_every
-#         self.learning_rate = learning_rate
-#         self.batch_size = batch_size
-#         if os.path.exists('/Users/leaf/CS767/birds/'):
-#             self.image_dir = '/Users/leaf/CS767/birds/data128_subset/'
-#             self.output_dir = '/Users/leaf/CS767/birds/output/'
-#             self.model_file = '/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
-#         else:
-#             self.image_dir = image_dir
-#             self.output_dir = output_dir
-#             self.model_file = model_file
-
 class BirdDataset(Dataset):
     def __init__(self, image_path, csv_file, transform=None):
 
@@ -110,11 +88,12 @@ class CNN(nn.Module):
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
+        out = self.layer3(out)
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
-        # out = self.fc2(out)
+        out = self.fc2(out)
         # Apply softmax here?
-        return F.log_softmax(out, dim=1)
+        # return F.log_softmax(out, dim=1)
 
 def build_datasets(path, batch_size):
     train_csv = os.path.join(path, 'train/train_data.txt')
@@ -184,36 +163,13 @@ def plot(loss_list, acc_list):
            color='red')
     show(p)
 
-def get_dirs(image, output):
-    # These are my directory names on my testing system (a Mac)
-    # The defaults in FLAGS are my directory names on my coding system (my Windows laptop)
-    # You can override them both with --image_dir and --output_dir
-    IMAGE_BASE = '/Users/leaf/CS767/30birds128/' 
-    OUTPUT_BASE = '/Users/leaf/CS767/birds/output/'
-    
-    image_dir = IMAGE_BASE 
-    if not os.path.exists(IMAGE_BASE):
-        image_dir = image
-    output_dir = OUTPUT_BASE 
-    if not os.path.exists(OUTPUT_BASE):
-        output_dir = output
-    if not os.path.exists(image_dir):
-        print("Not a valid image directory {}, try using --image_dir flag".format(image_dir))
-        return None, None
-    if not os.path.exists(output_dir):
-        print("Not a valid output directory {}, try using --output_dir flag".format(output_dir))
-        return None, None
-    else:
-        return image_dir, output_dir
-
-
 def main(
         epochs=10,
         display_every=50, 
         learning_rate=0.001,
         batch_size=100,
         image_dir='C:/datasets/Combined/processed/30birds128/',
-        output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output',
+        output_dir='C:/datasets/Combined/processed/output/',
         model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'):
     print("Getting set up...")
     IMAGE_SIZE = 128
@@ -223,15 +179,7 @@ def main(
         display_every = FLAGS.display_every
         learning_rate = FLAGS.learning_rate
         batch_size = FLAGS.batch_size
-        image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
-        model_file = FLAGS.model_file
-    else:
-        # Are we on hypatia? Use its directories instead
-        if os.path.exists('/Users/leaf/CS767/birds/'):
-            image_dir = '/Users/leaf/CS767/birds/data128_subset/'
-            output_dir = '/Users/leaf/CS767/birds/output/'
-            model_file = '/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
-        image_dir, output_dir = get_dirs(image_dir, output_dir)
+        image_dir, output_dir, model_file = FLAGS.image_dir, FLAGS.output_dir, FLAGS.model_file
 
     if image_dir and output_dir:
 

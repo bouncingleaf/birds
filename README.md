@@ -20,7 +20,7 @@ This is Jessica Roy's Final Project for Boston University MET CS 602 online, Pro
 
 You can comment out the "procs" section  near the end of image_preparation.py in order to rebuild the text file without re-cropping the images. Much faster!
 
-## Results
+## Results - first neural net (200 bird species)
 
 ### Round 1
 Training accuracy remained 0.00 no matter how many epochs, and the test part of the algorithm crashed. Hmm.
@@ -36,3 +36,18 @@ Flipped the images and rotated them slightly and cropped them slightly different
     Epoch [6/6], Step [120/120], Loss: 0.5243, Accuracy: 87.50%
 The test part of my algorithm crashed again... on a print statement, no less.
 
+## Results - second neural net (30 bird species that don't look much alike)
+
+python ./nn_30birds.py --batch_size=80 --epochs=7 --display_every=40
+Epoch [7/7], Step [80/99], Loss: 0.8290, Accuracy: 73.75%
+Testing the model...
+Accuracy on the test images: 79.09252669039147 %
+
+python ./nn_30birds.py --batch_size=80 --epochs=7 --display_every=40
+Removed a linear layer
+Epoch [7/7], Step [80/99], Loss: 1.2786, Accuracy: 65.00%
+Testing the model...
+Accuracy on the test images: 71.021860701576 %
+
+Modeling after https://cs230-stanford.github.io/pytorch-vision.html
+but without the dropout for now

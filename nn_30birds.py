@@ -183,7 +183,7 @@ def main(epochs, display_every, learning_rate, batch_size, validation_mode, mode
         model_dir = '/Users/Leaf/CS767/birds/models/'
 
     model_file = model_dir + model_file_id + "_nn_30birds.ckpt"
-    print("Running with epochs={}, disp={}, learning_rate={}, batch_size={}\nimage_dir={}\n output_dir={}\n model_file={}"
+    print("Running with epochs={}, display_every={}, learning_rate={}, batch_size={}\nimage_dir={}\n output_dir={}\n model_file={}"
     .format(epochs, display_every, learning_rate, batch_size, image_dir, output_dir, model_file))
 
     train_loader, test_or_validation_loader = build_datasets(image_dir, int(batch_size), validation_mode)

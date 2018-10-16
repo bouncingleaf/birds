@@ -14,6 +14,28 @@ import matplotlib.pyplot as plt
 
 FLAGS = None
 
+# class Params():
+#     def __init__(self,
+#         epochs=10,
+#         display_every=50, 
+#         learning_rate=0.001,
+#         batch_size=100,
+#         image_dir='C:/datasets/Combined/processed/30birds128/',
+#         output_dir='C:/datasets/Combined/processed/30birds128/output',
+#         model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'):
+#         self.epochs = epochs
+#         self.display_every = display_every
+#         self.learning_rate = learning_rate
+#         self.batch_size = batch_size
+#         if os.path.exists('/Users/leaf/CS767/birds/'):
+#             self.image_dir = '/Users/leaf/CS767/birds/data128_subset/'
+#             self.output_dir = '/Users/leaf/CS767/birds/output/'
+#             self.model_file = '/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
+#         else:
+#             self.image_dir = image_dir
+#             self.output_dir = output_dir
+#             self.model_file = model_file
+
 class BirdDataset(Dataset):
     def __init__(self, image_path, csv_file, transform=None):
 
@@ -184,63 +206,60 @@ def get_dirs(image, output):
     else:
         return image_dir, output_dir
 
-def main():
-    print("Getting set up...")
-    IMAGE_SIZE = 128
-    NUM_CLASSES = 30
-    image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
-    if image_dir and output_dir:
 
-        MODEL_FILE = output_dir + 'models/nn_30birds_20181014.ckpt'
-    
-        print("Building datasets from {}, with batch size={}...".format(image_dir, FLAGS.batch_size))
-        train_loader, test_loader = build_datasets(image_dir, int(FLAGS.batch_size))
-        model = CNN(IMAGE_SIZE, NUM_CLASSES)
-        
-        print("Training the model with learning rate {} for {} epochs...".format(FLAGS.learning_rate, FLAGS.epochs))
-        loss_list, acc_list = train(
-            model, 
-            train_loader, 
-            FLAGS.epochs, 
-            FLAGS.learning_rate, 
-            FLAGS.display_every)
-
-        print("Testing the model...")
-        model.eval()
-        test(model, test_loader)
-
-        print("Saving the model to {}...".format(MODEL_FILE))
-        torch.save(model.state_dict(), MODEL_FILE)
-
-        print("Attempting a plot...")
-        plot(loss_list, acc_list)
-
-        print("Done!")
-
-def run(
+def main(
         epochs=10,
         display_every=50, 
         learning_rate=0.001,
         batch_size=100,
         image_dir='C:/datasets/Combined/processed/30birds128/',
-        output_dir='C:/datasets/Combined/processed/30birds128/output',
+        output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output',
         model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'):
-    FLAGS.epochs = epochs
-    FLAGS.display_every = display_every
-    FLAGS.learning_rate = learning_rate
-    FLAGS.batch_size = batch_size
-    HOME='/Users/leaf/CS767/birds/'
-    if os.path.exists(HOME):
-        FLAGS.image_dir = HOME + 'data128_subset/'
-        FLAGS.output_dir = HOME + 'output/'
-        FLAGS.model_file = model_file + 'models/nn_30birds.ckpt'
+    print("Getting set up...")
+    IMAGE_SIZE = 128
+    NUM_CLASSES = 30
+    if FLAGS:
+        epochs = FLAGS.epochs
+        display_every = FLAGS.display_every
+        learning_rate = FLAGS.learning_rate
+        batch_size = FLAGS.batch_size
+        image_dir, output_dir = get_dirs(FLAGS.image_dir, FLAGS.output_dir)
+        model_file = FLAGS.model_file
     else:
-        FLAGS.image_dir = image_dir
-        FLAGS.output_dir = output_dir
-        FLAGS.model_file = model_file
-    print("Running with epochs={}, disp={}, learning_rate={}, batch_size={}, image_dir={}, output_dir={}, model_file={}"
+        # Are we on hypatia? Use its directories instead
+        if os.path.exists('/Users/leaf/CS767/birds/'):
+            image_dir = '/Users/leaf/CS767/birds/data128_subset/'
+            output_dir = '/Users/leaf/CS767/birds/output/'
+            model_file = '/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
+        image_dir, output_dir = get_dirs(image_dir, output_dir)
+
+    if image_dir and output_dir:
+
+        print("Running with epochs={}, disp={}, learning_rate={}, batch_size={},\nimage_dir={}, output_dir={}, model_file={}"
         .format(epochs, display_every, learning_rate, batch_size, image_dir, output_dir, model_file))
-    main()
+    
+        train_loader, test_loader = build_datasets(image_dir, int(batch_size))
+        model = CNN(IMAGE_SIZE, NUM_CLASSES)
+        
+        print("Training the model with learning rate {} for {} epochs...".format(learning_rate, epochs))
+        loss_list, acc_list = train(
+            model, 
+            train_loader, 
+            epochs, 
+            learning_rate, 
+            display_every)
+
+        print("Testing the model...")
+        model.eval()
+        test(model, test_loader)
+
+        print("Saving the model to {}...".format(model_file))
+        torch.save(model.state_dict(), model_file)
+
+        print("Attempting a plot...")
+        plot(loss_list, acc_list)
+
+        print("Done!")
 
 if __name__ == '__main__':
     # based on code from 

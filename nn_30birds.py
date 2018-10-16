@@ -168,14 +168,12 @@ def plot(loss_list, acc_list):
            color='red')
     show(p)
 
-def main(epochs, display_every, learning_rate, batch_size, validation_mode, model_file_id):
+def main(epochs, display_every, learning_rate, batch_size, validation_mode, model_file_id, hypatia):
     print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
 
-    HOME = True
-
-    if HOME:
+    if hypatia:
         image_dir = 'C:/datasets/Combined/processed/30birds128/'
         output_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
         model_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/'

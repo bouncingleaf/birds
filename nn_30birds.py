@@ -173,7 +173,7 @@ def main(epochs, display_every, learning_rate, batch_size, validation_mode, mode
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
 
-    if hypatia is "hypatia":
+    if hypatia:
         image_dir = '/Users/Leaf/CS767/30birds128/'
         output_dir = '/Users/Leaf/CS767/birds/output/'
         model_dir = '/Users/Leaf/CS767/birds/models/'

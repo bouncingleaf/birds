@@ -3,7 +3,7 @@ import nn_30birds
 
 count = 0
 
-hypatia=sys.argv[0]
+hypatia = len(sys.argv) > 1
 
 for i in [0.01, 0.005, 0.001, 0.0001]:
     count = count + 1

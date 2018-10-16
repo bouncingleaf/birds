@@ -173,14 +173,14 @@ def main(epochs, display_every, learning_rate, batch_size, validation_mode, mode
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
 
-    if hypatia:
-        image_dir = 'C:/datasets/Combined/processed/30birds128/'
-        output_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
-        model_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/'
-    else: 
+    if hypatia is "hypatia":
         image_dir = '/Users/Leaf/CS767/30birds128/'
         output_dir = '/Users/Leaf/CS767/birds/output/'
         model_dir = '/Users/Leaf/CS767/birds/models/'
+    else:
+        image_dir = 'C:/datasets/Combined/processed/30birds128/'
+        output_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
+        model_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/'
 
     model_file = model_dir + model_file_id + "_nn_30birds.ckpt"
     print("Running with epochs={}, display_every={}, learning_rate={}, batch_size={}\nimage_dir={}\n output_dir={}\n model_file={}"

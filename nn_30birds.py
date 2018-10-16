@@ -172,9 +172,9 @@ def main(
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
 
-    image_dir='/Users/leaf/CS767/30birds128/',
-    output_dir='/Users/leaf/CS767/birds/output/',
-    model_file='/Users/leaf/CS767/birds/models/nn_30birds.ckpt',
+    image_dir='/Users/leaf/CS767/30birds128/'
+    output_dir='/Users/leaf/CS767/birds/output/'
+    model_file='/Users/leaf/CS767/birds/models/nn_30birds.ckpt'
     # image_dir='C:/datasets/Combined/processed/30birds128/',
     # output_dir='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/',
     # model_file='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'

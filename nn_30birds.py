@@ -92,17 +92,22 @@ class CNN(nn.Module):
         out = self.fc2(out)
         # Apply softmax here?
         # return F.log_softmax(out, dim=1)
-
         return out
 
-def build_datasets(path, batch_size):
+def build_datasets(path, batch_size, validation_mode):
     train_csv = os.path.join(path, 'train/train_data.txt')
-    test_csv = os.path.join(path, 'test/test_data.txt')
     train_dataset = BirdDataset(path + 'train/', csv_file=train_csv, transform=ToTensor())
-    test_dataset = BirdDataset(path + 'test/', csv_file=test_csv, transform=ToTensor())
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
-    return train_loader, test_loader
+    if validation_mode:
+        validation_csv = os.path.join(path, 'test/validation_data.txt')
+        validation_dataset = BirdDataset(path + 'test/', csv_file=validation_csv, transform=ToTensor())
+        validation_loader = DataLoader(dataset=validation_dataset, batch_size=batch_size, shuffle=False)
+        return train_loader, validation_loader
+    else:
+        test_csv = os.path.join(path, 'test/test_v_data.txt')
+        test_dataset = BirdDataset(path + 'test/', csv_file=test_csv, transform=ToTensor())
+        test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+        return train_loader, test_loader
 
 # Train the model
 def train(model, train_loader, num_epochs, learning_rate, display_every):
@@ -163,7 +168,7 @@ def plot(loss_list, acc_list):
            color='red')
     show(p)
 
-def main(epochs, display_every, learning_rate, batch_size):
+def main(epochs, display_every, learning_rate, batch_size, validation_mode, model_file_id):
     print("Getting set up...")
     IMAGE_SIZE = 128
     NUM_CLASSES = 30
@@ -173,16 +178,17 @@ def main(epochs, display_every, learning_rate, batch_size):
     if HOME:
         image_dir = 'C:/datasets/Combined/processed/30birds128/'
         output_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/'
-        model_file = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt'
+        model_dir = 'C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/'
     else: 
         image_dir = '/Users/Leaf/CS767/30birds128/'
         output_dir = '/Users/Leaf/CS767/birds/output/'
-        model_file = '/Users/Leaf/CS767/birds/models/nn_30birds.ckpt'
+        model_dir = '/Users/Leaf/CS767/birds/models/'
 
+    model_file = model_dir + model_file_id + "_nn_30birds.ckpt"
     print("Running with epochs={}, disp={}, learning_rate={}, batch_size={}\nimage_dir={}\n output_dir={}\n model_file={}"
     .format(epochs, display_every, learning_rate, batch_size, image_dir, output_dir, model_file))
 
-    train_loader, test_loader = build_datasets(image_dir, int(batch_size))
+    train_loader, test_or_validation_loader = build_datasets(image_dir, int(batch_size), validation_mode)
     model = CNN(IMAGE_SIZE, NUM_CLASSES)
     
     print("Training the model with learning rate {} for {} epochs...".format(learning_rate, epochs))
@@ -193,9 +199,12 @@ def main(epochs, display_every, learning_rate, batch_size):
         learning_rate, 
         display_every)
 
-    print("Testing the model...")
+    if validation_mode:
+        print("Validating the model...")
+    else:
+        print("Testing the model...")
     model.eval()
-    test(model, test_loader)
+    test(model, test_or_validation_loader)
 
     print("Saving the model to {}...".format(model_file))
     torch.save(model.state_dict(), model_file)
@@ -206,8 +215,6 @@ def main(epochs, display_every, learning_rate, batch_size):
     print("Done!")
 
 if __name__ == '__main__':
-    # based on code from 
-    # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=10,
                         help='Number of epochs to run trainer.')
@@ -219,20 +226,5 @@ if __name__ == '__main__':
     #                     help='Keep probability for training dropout.')
     parser.add_argument('--batch_size', type=float, default=100,
                         help='Batch size.')
-    parser.add_argument(
-        '--image_dir',
-        type=str,
-        default='C:/datasets/Combined/processed/30birds128/',
-        help='Where to find the processed images')
-    parser.add_argument(
-        '--output_dir',
-        type=str,
-        default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/output/',
-        help='Where to store the output from this program')
-    parser.add_argument(
-        '--model_file',
-        type=str,
-        default='C:/Users/Leaf/Google Drive/School/BU-MET-CS-767/Project/birds/models/nn_30birds.ckpt',
-        help='Where to store the output from this program')
     FLAGS, unparsed = parser.parse_known_args()
-    main(FLAGS.epochs, FLAGS.display_every, FLAGS.learning_rate, FLAGS.batch_size)
+    main(FLAGS.epochs, FLAGS.display_every, FLAGS.learning_rate, FLAGS.batch_size, False, "20181016")

@@ -154,19 +154,19 @@ def test(model, test_loader):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-        print('Accuracy on the test images: {} %'.format((correct / total) * 100))
+        print('Accuracy on the test (or validation) images: {} %'.format((correct / total) * 100))
 
 
-def plot(loss_list, acc_list):
-    p = plt.figure(y_axis_label='Loss', width=850, y_range=(0, 1), title='ConvNet results')
-    p.extra_y_ranges = {'Accuracy': Range1d(start=0, end=100)}
-    p.add_layout(LinearAxis(y_range_name='Accuracy', axis_label='Accuracy (%)'), 'right')
-    p.line(np.arange(len(loss_list)), loss_list)
-    p.line(np.arange(len(loss_list)), 
-           np.array(acc_list) * 100,
-           y_range_name='Accuracy',
-           color='red')
-    show(p)
+# def plot(loss_list, acc_list):
+#     p = plt.figure(y_axis_label='Loss', width=850, y_range=(0, 1), title='ConvNet results')
+#     p.extra_y_ranges = {'Accuracy': Range1d(start=0, end=100)}
+#     p.add_layout(LinearAxis(y_range_name='Accuracy', axis_label='Accuracy (%)'), 'right')
+#     p.line(np.arange(len(loss_list)), loss_list)
+#     p.line(np.arange(len(loss_list)), 
+#            np.array(acc_list) * 100,
+#            y_range_name='Accuracy',
+#            color='red')
+#     show(p)
 
 def main(epochs, display_every, learning_rate, batch_size, validation_mode, model_file_id, hypatia):
     print("Getting set up...")
@@ -207,8 +207,9 @@ def main(epochs, display_every, learning_rate, batch_size, validation_mode, mode
     print("Saving the model to {}...".format(model_file))
     torch.save(model.state_dict(), model_file)
 
-    print("Attempting a plot...")
-    plot(loss_list, acc_list)
+    # Never did quite get this to work.
+    # print("Attempting a plot...")
+    # plot(loss_list, acc_list)
 
     print("Done!")
 
